@@ -5,6 +5,7 @@ Nexusflow function call, tool use, and agent benchmarks.
 - [Setup](#setup)
 - [Nexusbench options](#nexusbench-options)
   - [Documentation](#documentation)
+- [Running Athene-V2 models](#running-athene-v2-models)
 - [Overview](#overview)
 - [Features](#features)
 - [Chat benchmarks](#chat-benchmarks)
@@ -57,6 +58,34 @@ nexusbench \
 ## Documentation
 
 1. [benchmarks.md](docs/benchmarks.md): Descriptions of the benchmarks included in this repository.
+
+
+# Running Athene-V2 models
+
+Please see the [Athene-V2-Agent HuggingFace model repo](https://huggingface.co/Nexusflow/Athene-V2-Agent#openai-compatible-fc) for the most up-to-date instructions on how to run the Athene-V2 models!
+
+Below are instructions copied from the repo for convenience.
+
+Athene-V2-Agent is usable in any OpenAI API-compatible environment using our VLLM docker image. This should be a simple "drop-in" replacement to any agentic or tool-use setting with our VLLM docker image.
+
+```bash
+docker run --name athene-v2-agent \
+    --runtime nvidia --gpus '"device=0,1,2,3,4,5,6,7"' \
+    -v ~/.cache/huggingface:/root/.cache/huggingface \
+    --env "HUGGING_FACE_HUB_TOKEN=<secret>" \
+    -p <port>:8000 \
+    --ipc=host \
+    ghcr.io/nexusflowai/athene-v2-vllm:latest \
+    --model Nexusflow/Athene-V2-Agent \
+    --dtype=auto \
+    --tensor-parallel-size=8 \
+    --enable-auto-tool-choice \
+    --tool-call-parser Athene-V2-Agent
+```
+
+You can now submit any OpenAI-Compatible tool-use requests to the model by hitting the VLLM endpoint. Athene-V2-Agent will be able to issue tool calls that you can execute and return results for.
+
+WARNING: Athene-V2-Agent uses a CUSTOM prompting style that is baked into the custom docker image, as the executable calls are extracted from the model's generated planning. For best performance, please ensure to use the docker image above for Athene-V2-Agent, including when benchmarking the model. Using HuggingFace tokenizer's chat template will yield suboptimal results for Agent usecases. Please reach out to us on Discord if you run into any issues!
 
 
 # Overview
