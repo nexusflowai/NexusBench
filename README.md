@@ -199,3 +199,13 @@ To add a new benchmark:
 1. Create a new benchmark class in `benchmarks.py`
 2. Implement the required methods: `get_samples()`, `tools`, `get_json_representation`
 3. Add the benchmark to the `BENCHMARKS` list in `config.py`
+
+# Citation
+```
+@misc{nexusbench,
+      title={NexusBench: FC and Agent Benchmarking Suite},
+      author={Nexusflow.ai team},
+      year={2024},
+      url={https://github.com/nexusflowai/NexusBench}
+}
+```
