@@ -1,0 +1,46 @@
+name: Modular Tests
+
+on:
+  workflow_dispatch:  # Can run on demand
+  pull_request:  # Run on every pull request
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11"]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          pip install uv
+          uv pip install --system -e ".[dev]"
+      - name: Show installed packages
+        run: |
+          pip list
+      - name: HF login
+        env:
+          HF_API_KEY: ${{ secrets.HF_API_KEY }}
+        run: |
+          huggingface-cli login --token "$HF_API_KEY"
+      - name: Run formatting check
+        run: |
+          black . --check
+      - name: Run pylint QA
+        run: pylint nexusbench
+      - name: Run tests
+        env:
+          HUGGING_FACE_HUB_TOKEN: ${{ secrets.HF_API_KEY }}
+          FULL: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          pytest
