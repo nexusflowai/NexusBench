@@ -8,11 +8,11 @@ Nexusflow function call, tool use, and agent benchmarks.
 - [Overview](#overview)
 - [Features](#features)
 - [Chat benchmarks](#chat-benchmarks)
-  - [Citations](#citations)
+- [Citations](#citations)
 - [Contributing](#contributing)
   - [Adding New Clients](#adding-new-clients)
   - [Adding New Benchmarks](#adding-new-benchmarks)
-
+- [Citations](#citation)
 
 ![Benchmark Taxonomy](docs/benchmark_taxonomy.png)
 
@@ -105,7 +105,7 @@ The Github repository links below are the corresponding ones used for our benchm
    2. Github: https://github.com/TIGER-AI-Lab/MMLU-Pro
 
 
-## Citations
+# Citations
 Thank you so much to the amazing authors and their contributions cited below!
 ```
 @article{li2024crowdsourced,
@@ -201,6 +201,9 @@ To add a new benchmark:
 3. Add the benchmark to the `BENCHMARKS` list in `config.py`
 
 # Citation
+
+Please use the following citation when referencing our work:
+
 ```
 @misc{nexusbench,
       title={NexusBench: FC and Agent Benchmarking Suite},
