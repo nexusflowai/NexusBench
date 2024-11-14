@@ -28,11 +28,6 @@ jobs:
       - name: Show installed packages
         run: |
           pip list
-      - name: HF login
-        env:
-          HF_API_KEY: ${{ secrets.HF_API_KEY }}
-        run: |
-          huggingface-cli login --token "$HF_API_KEY"
       - name: Run formatting check
         run: |
           black . --check
@@ -40,7 +35,6 @@ jobs:
         run: pylint nexusbench
       - name: Run tests
         env:
-          HUGGING_FACE_HUB_TOKEN: ${{ secrets.HF_API_KEY }}
           FULL: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
           pytest
