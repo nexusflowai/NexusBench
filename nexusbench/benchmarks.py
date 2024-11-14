@@ -469,9 +469,7 @@ class ITType0Benchmark(SingleTurnBenchmark):
     NAME = "ITType0Benchmark"
 
     def get_samples(self) -> List[Sample]:
-        dataset = load_dataset(
-            "Nexusflow/instruction_following_trial_v4_harder", split="train"
-        )
+        dataset = load_dataset("Nexusflow/ITType0Benchmark", split="train")
         return [Sample(query=d["Input"], reference=d["Output"]) for d in dataset]
 
     @property
@@ -496,9 +494,7 @@ class ITType1Benchmark(SingleTurnBenchmark):
     NAME = "ITType1Benchmark"
 
     def get_samples(self) -> List[Sample]:
-        dataset = load_dataset(
-            "Nexusflow/instruction_following_trial_v3_hard_level1", split="train"
-        )
+        dataset = load_dataset("Nexusflow/ITType1Benchmark", split="train")
         return [Sample(query=d["Input"], reference=d["Output"]) for d in dataset]
 
     @property
@@ -523,9 +519,7 @@ class TicketTracking(SingleTurnBenchmark):
     NAME = "TicketTracking"
 
     def get_samples(self) -> List[Sample]:
-        dataset = load_dataset(
-            "Nexusflow/Ticket-tracking-benchmark-data", split="train"
-        )
+        dataset = load_dataset("Nexusflow/TicketTrackingBenchmark", split="train")
         return [Sample(query=d["Input"], reference=d["Output"]) for d in dataset]
 
     @property
@@ -556,12 +550,8 @@ class TMIHallucination(SingleTurnBenchmark):
 
     def get_samples(self) -> List[Sample]:
         dataset = load_dataset("Nexusflow/HallucinationTMIBenchmark", split="train")
-        json_dataset = load_dataset(
-            "Nexusflow/HallucinationTMIBenchmark-20240829-json-tools",
-            split="train",
-        )
         all_samples = []
-        for sample, json_sample in zip(dataset, json_dataset):
+        for sample in dataset:
             original_call = sample["original_ground_truth"]
             correct_call = sample["modified_correct_ground_truth"]
 
@@ -577,7 +567,7 @@ class TMIHallucination(SingleTurnBenchmark):
             args_to_avoid = original_args - correct_args
             arg_to_avoid = list(args_to_avoid)
 
-            json_tools = json.loads(json_sample["json_tools"])
+            json_tools = json.loads(sample["json_tools"])
             json_tools = {tool["name"]: tool for tool in json_tools}
 
             this_sample = self.TMISample(
@@ -669,9 +659,7 @@ class LangChainMath(AgentBenchmark):
         return get_all_functions_json()
 
     def get_samples(self) -> List[Sample]:
-        dataset = load_dataset(
-            "Nexusflow/Langchain-Multiverse-math-dataset", split="train"
-        )
+        dataset = load_dataset("Nexusflow/LangChainMathBenchmark", split="train")
         return [
             Sample(query=d["inputs"]["question"], reference=d["outputs"]["reference"])
             for d in dataset
@@ -729,7 +717,7 @@ class LangChainMultitoolTypeWriterHard(AgentBenchmark):
 
     def get_samples(self) -> List[MTHSample]:
         dataset = load_dataset(
-            "Nexusflow/Langchain-Typewriter-hard-no-whitespaces", split="train"
+            "Nexusflow/LangChainMultitoolTypeWriterHard", split="train"
         ).select(range(30))
         return [
             LangChainMultitoolTypeWriterHard.MTHSample(
@@ -817,9 +805,7 @@ class LangChainRelational(AgentBenchmark):
         return eval(function_calls_str)
 
     def get_samples(self) -> List[RelationalSample]:
-        dataset = load_dataset(
-            "Nexusflow/Langchain-Relational-dataset-updated", split="train"
-        )
+        dataset = load_dataset("Nexusflow/LangChainRelational", split="train")
         return [
             LangChainRelational.RelationalSample(
                 query=d["user_query"],
@@ -964,7 +950,7 @@ class MultiverseMathHard(LangChainMath):
             return_constant,
         )
 
-        dataset = load_dataset("Nexusflow/MultiverseMathSimpleSet", split="train")
+        dataset = load_dataset("Nexusflow/MultiverseMathHard", split="train")
         return [
             MultiverseMathHard.MMMSample(
                 query=d["prompt"],
@@ -1209,7 +1195,7 @@ class VirusTotalAgentic(AgentBenchmark):
         num_functions: int
 
     def get_samples(self) -> List[VTSample]:
-        dataset = load_dataset("Nexusflow/VirusTotalMultiple-trial", split="train")
+        dataset = load_dataset("Nexusflow/VirusTotalAgentic", split="train")
         return [
             VirusTotalAgentic.VTSample(
                 query=d["generated_question"],
