@@ -154,6 +154,12 @@ Thank you so much to the amazing authors and their contributions cited below!
     journal={arXiv preprint arXiv:2311.07911},
     year={2023}
 }
+@misc{langchainbenchmarks2024,
+   title={LangChain Benchmarks},
+   author={LangChain AI},
+   year={2024},
+   howpublished={\url{https://github.com/langchain-ai/langchain-benchmarks}}
+}
 @inproceedings{rein2024gpqa,
     title={{GPQA}: A Graduate-Level Google-Proof Q\&A Benchmark},
     author={David Rein and Betty Li Hou and Asa Cooper Stickland and Jackson Petty and Richard Yuanzhe Pang and Julien Dirani and Julian Michael and Samuel R. Bowman},
