@@ -1,8 +1,12 @@
 from typing import Optional
 
+from nexusflowai import NexusflowAI
+
 from openai import OpenAI
 
 from anthropic import Anthropic
+
+from mistralai.client import MistralClient
 
 from nexusbench.utils import handle_exceptions
 
@@ -26,6 +30,45 @@ class BaseClient:
             params[base_url_key] = self.base_url
 
         return params
+
+
+class NexusflowAIFCClient(BaseClient):
+    def create_client(self):
+        return NexusflowAI(**self.get_client_params())
+
+    @handle_exceptions
+    def get_completion(
+        self, prompt, model="nexus-tool-use-20240816", contextual_history=None
+    ):
+        self.client: NexusflowAI
+        response = self.client.chat.completions.create(
+            model=model,
+            messages=prompt["messages"],
+            tools=prompt["tools"],
+            max_tokens=2048,
+            temperature=0.0,
+            parallel_tool_calls=False,
+        )
+
+        return response
+
+
+class NexusflowAICompletionsClient(NexusflowAIFCClient):
+    @handle_exceptions
+    def get_completion(
+        self, prompt, model="nexus-tool-use-20240816", contextual_history=None
+    ):
+        self.client: NexusflowAI
+        response = self.client.completions.create_with_tools(
+            model=model,
+            messages=prompt["messages"],
+            tools=prompt["tools"],
+            max_tokens=2048,
+            temperature=0.0,
+            parallel_tool_calls=False,
+        )
+
+        return response
 
 
 class QwenFCClient(BaseClient):
@@ -89,8 +132,6 @@ class OpenAIFCClient(BaseClient):
 
 class MistralFCClient(BaseClient):
     def create_client(self):
-        from mistralai.client import MistralClient
-
         return MistralClient(**self.get_client_params("endpoint"))
 
     @handle_exceptions

@@ -164,12 +164,10 @@ class FCAPIPrompter:
         Returns:
             Dict containing the formatted tool message.
         """
-        name = tool_calls.function.name
-        id = tool_calls.id
         return {
             "role": "tool",
-            "tool_call_id": id,
-            "name": name,
+            "tool_call_id": tool_calls.id,
+            "name": tool_calls.function.name,
             "content": json.dumps(result),
         }
 
@@ -249,6 +247,22 @@ class FCAPIPrompter:
             tools.append({"type": "function", "function": val})
 
         return {"messages": messages, "tools": tools}
+
+
+@dataclass
+class NexusflowAIFCPrompter(FCAPIPrompter):
+    def create_client(self):
+        from nexusbench.clients import NexusflowAIFCClient
+
+        return NexusflowAIFCClient(**self.get_client_params())
+
+
+@dataclass
+class NexusflowAICompletionsPrompter(FCAPIPrompter):
+    def create_client(self):
+        from nexusbench.clients import NexusflowAICompletionsClient
+
+        return NexusflowAICompletionsClient(**self.get_client_params())
 
 
 @dataclass
@@ -476,7 +490,7 @@ class AnthropicFCPrompter(FCAPIPrompter):
                 result["system"] = this_messages["content"]
                 del result["messages"][idx]
 
-        if not "system" in result:
+        if "system" not in result:
             result["system"] = ""
 
         # Mostly the same as OpenAI FC format, but requires some surgery, done here.

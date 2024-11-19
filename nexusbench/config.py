@@ -19,6 +19,8 @@ from nexusbench.benchmarks import (
     VirusTotalAgentic,
 )
 from nexusbench.prompters import (
+    NexusflowAIFCPrompter,
+    NexusflowAICompletionsPrompter,
     OpenAIFCPrompter,
     AnthropicFCPrompter,
     MistralFCPrompter,
@@ -32,6 +34,8 @@ class ClientConfig:
 
 
 CLIENTS = {
+    "NexusflowAI": ClientConfig(NexusflowAIFCPrompter),
+    "NexusflowAICompletions": ClientConfig(NexusflowAICompletionsPrompter),
     "OpenAI": ClientConfig(OpenAIFCPrompter),
     "Anthropic": ClientConfig(AnthropicFCPrompter),
     "Mistral": ClientConfig(MistralFCPrompter),

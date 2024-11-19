@@ -40,7 +40,7 @@ nexusbench \
                         How many benchmarks to run in parallel
   --num_samples_parallel NUM_SAMPLES_PARALLEL
                         How many samples to run in parallel per benchmark
-  --client {OpenAI,Anthropic,Mistral,Qwen}
+  --client {NexusflowAI,NexusflowAICompletions,OpenAI,Anthropic,Mistral,Qwen}
                         The client to use for running the benchmarks
   --base_url BASE_URL   The base url for the inference backend used by the client.
   --api_key API_KEY     API key for the model (if required)
