@@ -1066,10 +1066,6 @@ class ClimateBenchmark(AgentBenchmark):
 
         return False
 
-    @property
-    def get_json_representation(self) -> dict:
-        pass
-
     def aggregate_step(self, so_far, next_item):
         return next_item, next_item
 

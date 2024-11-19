@@ -4,6 +4,8 @@ import argparse
 
 from functools import partial
 
+from time import time
+
 from os import environ
 
 import json
@@ -25,20 +27,21 @@ from nexusbench.config import (
     get_unique_settings,
     get_unique_behaviors,
 )
-from nexusbench.utils import print_benchmark_results
+from nexusbench.utils import DEFAULT_MAX_EXECUTION_RETRIES, print_benchmark_results
 
 
 class BenchmarkRunner:
     def __init__(
         self,
         client: str,
-        api_key: Optional[str] = None,
-        model: Optional[str] = None,
-        base_url: Optional[str] = None,
-        num_samples_parallel: Optional[int] = None,
-        num_benchmarks_parallel: Optional[int] = None,
-        debug: Optional[bool] = False,
-    ):
+        api_key: str,
+        model: str,
+        base_url: str,
+        num_samples_parallel: int,
+        num_benchmarks_parallel: int,
+        debug: bool,
+        max_execution_retries: int,
+    ) -> None:
         self.client = client
         self.client_config: ClientConfig = CLIENTS[client]
         self.prompter = self.client_config.prompter_class(api_key, model, base_url)
@@ -46,11 +49,15 @@ class BenchmarkRunner:
         self.num_samples_parallel = num_samples_parallel
         self.num_benchmarks_parallel = num_benchmarks_parallel
         self.debug = debug
+        self.max_execution_retries = max_execution_retries
 
         environ["NUM_SAMPLES_PARALLEL"] = json.dumps(self.num_samples_parallel)
         environ["DEBUG"] = json.dumps(self.debug)
+        environ["MAX_EXECUTION_RETRIES"] = json.dumps(self.max_execution_retries)
 
     def run_single_benchmark(self, benchmark_class, limit):
+        start_time = time()
+
         name = benchmark_class.__name__
         print(f"Benchmarking {name}")
         benchmark = benchmark_class()
@@ -75,7 +82,10 @@ class BenchmarkRunner:
         print(f"Number of Samples: {len(inputs)}")
         correct_calls = benchmark.process_sample(inputs)
         metrics = benchmark.get_metrics(correct_calls)
-        return benchmark_class, metrics, correct_calls
+
+        time_taken_s = time() - start_time
+
+        return benchmark_class, metrics, correct_calls, time_taken_s
 
     def run_benchmarks(self, benchmarks: List[Type], limit: Optional[int] = None):
         with Pool(self.num_benchmarks_parallel) as pool:
@@ -104,6 +114,7 @@ def discover_benchmarks(
     suite_name: Optional[str] = None,
     show_settings: bool = False,
     show_behaviors: bool = False,
+    # pylint: disable=redefined-builtin
     format: Literal["table", "detailed"] = "table",
 ) -> None:
     """
@@ -261,6 +272,13 @@ def main():
         "--debug",
         help="Print error traceback or just the error repr.",
         action="store_true",
+        default=False,
+    )
+    parser.add_argument(
+        "--max_execution_retries",
+        type=int,
+        help="Maximum number of retries for a failing sample",
+        default=DEFAULT_MAX_EXECUTION_RETRIES,
     )
 
     args = parser.parse_args()
@@ -279,6 +297,7 @@ def main():
         args.num_samples_parallel,
         args.num_benchmarks_parallel,
         args.debug,
+        args.max_execution_retries,
     )
 
     # Get the selected suite(s)
