@@ -274,6 +274,50 @@ class OpenAIFCPrompter(FCAPIPrompter):
 
 
 @dataclass
+class AtheneV2Prompter(OpenAIFCPrompter):
+    def create_prompt(
+        self,
+        tool_descriptions: str,
+        query: str,
+        additional_instructions: str = None,
+        contextual_history: List[Dict] = None,
+    ) -> str:
+        result = super().create_prompt(
+            tool_descriptions,
+            query,
+            additional_instructions,
+            contextual_history,
+        )
+        result["messages"].append(
+            {
+                "role": "system",
+                "content": """
+In this task, you are given a bunch of tools above and a user query.
+Issue function calls calls that will answer the user query.
+
+Note that some calls were already issued and the results are presented.
+If you think all calls are executed, do not issue another call. Otherwise,
+please issue a single function call. Proceed with either the call or an empty string.
+
+Please ONLY issue a single pythonic function call and NOTHING ELSE (if you want to issue a call).""",
+            }
+        )
+
+        # Mostly the same as OpenAI FC format, but requires some surgery, done here.
+        tools = result["tools"]
+        new_tools = []
+        for tool in tools:
+            new_func = copy.deepcopy(tool)
+            if "returns" in new_func["function"]:
+                del new_func["function"]["returns"]
+            new_tools.append(new_func)
+
+        result["tools"] = new_tools
+
+        return result
+
+
+@dataclass
 class QwenFCPrompter(FCAPIPrompter):
     def _get_message_from_previous_response(self, previous_response):
         return previous_response
