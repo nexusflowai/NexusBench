@@ -126,7 +126,6 @@ class OpenAIFCClient(BaseClient):
             temperature=0.0,
             parallel_tool_calls=False,
         )
-
         return response
 
 

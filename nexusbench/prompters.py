@@ -288,18 +288,30 @@ class AtheneV2Prompter(OpenAIFCPrompter):
             additional_instructions,
             contextual_history,
         )
-        result["messages"].append(
+       
+        if result["messages"][0]["role"] == "system":
+            original_system = result["messages"][0]
+            result["messages"] = result["messages"][1:]
+        else:
+            original_system = ""
+
+        result["messages"].insert(0,
             {
                 "role": "system",
                 "content": """
-In this task, you are given a bunch of tools above and a user query.
-Issue function calls calls that will answer the user query.
+SYSTEM MSG:
+In this task, you are given a bunch of tools and a user query. The user role message is the user query.
+Issue tool calls that will address the user query.
 
-Note that some calls were already issued and the results are presented.
+Note that some calls might have already been already issued and the results are presented as tool results.
 If you think all calls are executed, do not issue another call. Otherwise,
-please issue a single function call. Proceed with either the call or an empty string.
+please issue a single tool call.
 
-Please ONLY issue a single pythonic function call and NOTHING ELSE (if you want to issue a call).""",
+Do not chat. Do not say anything. You will have to issue a tool call ONLY.
+
+{original_system}
+END SYSTEM MSG"""
+
             }
         )
 
