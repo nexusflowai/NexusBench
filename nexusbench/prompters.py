@@ -288,7 +288,7 @@ class AtheneV2Prompter(OpenAIFCPrompter):
             additional_instructions,
             contextual_history,
         )
-       
+
         num_assistant_steps = 0
         for msg in result["messages"]:
             if hasattr(msg, "role") and msg.role == "assistant":
@@ -298,10 +298,11 @@ class AtheneV2Prompter(OpenAIFCPrompter):
             original_system = result["messages"][0]
             result["messages"] = result["messages"][1:]
         else:
-                original_system = ""
+            original_system = ""
 
         if num_assistant_steps == 0:
-            result["messages"].insert(0,
+            result["messages"].insert(
+                0,
                 {
                     "role": "system",
                     "content": """
@@ -316,12 +317,12 @@ class AtheneV2Prompter(OpenAIFCPrompter):
     Do not chat. Do not say anything. You will have to issue a tool call ONLY.
 
     {original_system}
-    END SYSTEM MSG"""
-
-                }
+    END SYSTEM MSG""",
+                },
             )
         else:
-            result["messages"].insert(0,
+            result["messages"].insert(
+                0,
                 {
                     "role": "system",
                     "content": """
@@ -334,9 +335,8 @@ class AtheneV2Prompter(OpenAIFCPrompter):
     please issue a single tool call.
 
     {original_system}
-    END SYSTEM MSG"""
-
-                }
+    END SYSTEM MSG""",
+                },
             )
 
         # Mostly the same as OpenAI FC format, but requires some surgery, done here.
