@@ -289,31 +289,55 @@ class AtheneV2Prompter(OpenAIFCPrompter):
             contextual_history,
         )
        
+        num_assistant_steps = 0
+        for msg in result["messages"]:
+            if hasattr(msg, "role") and msg.role == "assistant":
+                num_assistant_steps += 1
+
         if result["messages"][0]["role"] == "system":
             original_system = result["messages"][0]
             result["messages"] = result["messages"][1:]
         else:
-            original_system = ""
+                original_system = ""
 
-        result["messages"].insert(0,
-            {
-                "role": "system",
-                "content": """
-SYSTEM MSG:
-In this task, you are given a bunch of tools and a user query. The user role message is the user query.
-Issue tool calls that will address the user query.
+        if num_assistant_steps == 0:
+            result["messages"].insert(0,
+                {
+                    "role": "system",
+                    "content": """
+    SYSTEM MSG:
+    In this task, you are given a bunch of tools and a user query. The user role message is the user query.
+    Issue tool calls that will address the user query.
 
-Note that some calls might have already been already issued and the results are presented as tool results.
-If you think all calls are executed, do not issue another call. Otherwise,
-please issue a single tool call.
+    Note that some calls might have already been already issued and the results are presented as tool results.
+    If you think all calls are executed, do not issue another call. Otherwise,
+    please issue a single tool call.
 
-Do not chat. Do not say anything. You will have to issue a tool call ONLY.
+    Do not chat. Do not say anything. You will have to issue a tool call ONLY.
 
-{original_system}
-END SYSTEM MSG"""
+    {original_system}
+    END SYSTEM MSG"""
 
-            }
-        )
+                }
+            )
+        else:
+            result["messages"].insert(0,
+                {
+                    "role": "system",
+                    "content": """
+    SYSTEM MSG:
+    In this task, you are given a bunch of tools and a user query. The user role message is the user query.
+    Issue tool calls that will address the user query.
+
+    Note that some calls might have already been already issued and the results are presented as tool results.
+    If you think all calls are executed, do not issue another call. Otherwise,
+    please issue a single tool call.
+
+    {original_system}
+    END SYSTEM MSG"""
+
+                }
+            )
 
         # Mostly the same as OpenAI FC format, but requires some surgery, done here.
         tools = result["tools"]
