@@ -25,6 +25,7 @@ from nexusbench.prompters import (
     AnthropicFCPrompter,
     MistralFCPrompter,
     QwenFCPrompter,
+    AtheneV2Prompter,
 )
 
 
@@ -40,6 +41,7 @@ CLIENTS = {
     "Anthropic": ClientConfig(AnthropicFCPrompter),
     "Mistral": ClientConfig(MistralFCPrompter),
     "Qwen": ClientConfig(QwenFCPrompter),
+    "AtheneChat": ClientConfig(AtheneV2Prompter),
 }
 
 
